@@ -1,0 +1,31 @@
+#!/usr/bin/with-contenv sh
+
+DB_BASE=/var/lib/postgresql
+WHOAMI="[$(basename $0)]"
+if [ -z "$DB_NAME" ]; then
+  echo "DB_NAME not set"
+  exit 128
+fi
+
+if [ ! -d "$DB_BASE" ]; then 
+  echo "$WHOAMI $DB_BASE: not a directory" >&2
+  exit 1
+fi
+
+DB_PATH=$DB_BASE/$DB_NAME
+if [ -d "$DB_PATH" -a -f "$DB_PATH/PG_VERSION" ]; then
+  echo "$WHOAMI $DB_PATH contains what appears to be a database"
+  exit 129
+fi
+
+su postgres -c "initdb --pgdata \"$DB_PATH\""
+if [ $? -ne 0 ]; then
+  echo "$WHOAMI error initializing $DB_PATH" >&2
+  exit 1
+fi
+
+su postgres -c "sed -i -E -e '/^host.*all.*all.*127/a host	all		all		172.17.0.0/16		trust' $DB_PATH/pg_hba.conf"
+
+su postgres -c "sed -i -E -e 's/^#max_prepared_transactions = 0/max_prepared_transactions = 100/' $DB_PATH/postgresql.conf"
+
+/etc/postgresql/setup.sh &
