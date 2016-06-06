@@ -4,9 +4,9 @@ A PostgreSQL 9.5 image based on Alpine 3.4
 
 ## Environment Variables
 
-`DB_NAME` -- database name (default is _demo_)
-`DB_USER` -- database user name (default is `$DB_NAME`)
-`DB_PASSWORD` -- database password (default is `$DB_USER`)
+* `DB_NAME` -- database name (default is _demo_)
+* `DB_USER` -- database user name (default is `$DB_NAME`)
+* `DB_PASSWORD` -- database password (default is `$DB_USER`)
 
 ## Database Storage
  
