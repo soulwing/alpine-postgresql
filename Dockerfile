@@ -9,4 +9,7 @@ RUN tar xzf /tmp/s6-overlay-amd64.tar.gz -C /
 COPY etc/ /etc/
 
 ENV DB_NAME=demo
+
+EXPOSE 5432
+
 ENTRYPOINT ["/init"]
