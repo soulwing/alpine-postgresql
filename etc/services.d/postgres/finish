@@ -1,3 +1,6 @@
-#!/usr/bin/execlineb -S0
+#!/bin/sh
 
-s6-svscanctl -t /var/run/s6/services
+S6_SERVICES=/var/run/s6/services
+if s6-svok "$S6_SERVICES/postgres"; then 
+ s6-svscanctl -t "$S6_SERVICES"
+fi
