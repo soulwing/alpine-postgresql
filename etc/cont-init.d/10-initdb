@@ -1,6 +1,7 @@
 #!/usr/bin/with-contenv sh
 
 DB_BASE=/var/lib/postgresql
+
 WHOAMI="[$(basename $0)]"
 if [ -z "$DB_NAME" ]; then
   echo "DB_NAME not set"
@@ -18,14 +19,42 @@ if [ -d "$DB_PATH" -a -f "$DB_PATH/PG_VERSION" ]; then
   exit 129
 fi
 
-su postgres -c "initdb --pgdata \"$DB_PATH\""
+su postgres -c "initdb --auth=trust --pgdata \"$DB_PATH\""
 if [ $? -ne 0 ]; then
   echo "$WHOAMI error initializing $DB_PATH" >&2
   exit 1
 fi
 
-su postgres -c "sed -i -E -e '/^host.*all.*all.*127/a host	all		all		172.17.0.0/16		trust' $DB_PATH/pg_hba.conf"
+if [ -z "$DB_HBA_TRUST_NETS" ]; then
+  DB_HBA_TRUST_NETS="172.17.0.0/16"
+fi
 
-su postgres -c "sed -i -E -e 's/^#max_prepared_transactions = 0/max_prepared_transactions = 100/' $DB_PATH/postgresql.conf"
+if [ "$DB_HBA_TRUST_NETS" != "none" ]; then
+  for net in $DB_HBA_TRUST_NETS; do
+    echo "$WHOAMI adding $net for 'trust' authentication"
+    su postgres -c "sed -i -E -e '/^host.*all.*all.*127/a host	all		all		$net		trust' $DB_PATH/pg_hba.conf"
+  done
+fi
+
+if [ -n "$DB_HBA_MD5_NETS" -a "$DB_HBA_MD5_NETS" != "none" ]; then
+  for net in $DB_HBA_MD5_NETS; do
+    echo "$WHOAMI adding $net for 'md5' authentication"
+    su postgres -c "sed -i -E -e '$ a host	all		all		$net		md5' $DB_PATH/pg_hba.conf"
+  done
+fi
+
+if [ -n "$DB_MAX_PREPARED_TRANSACTIONS" ]; then
+  DB_MAX_CONNECTIONS=$DB_MAX_PREPARED_TRANSACTIONS
+fi
+
+if [ -n "$DB_MAX_CONNECTIONS" ]; then
+  echo "$WHOAMI setting max_connections=$DB_MAX_CONNECTIONS"
+  su postgres -c "sed -i -E -e 's/^max_connections *= *[0-9]+/max_connections=$DB_MAX_CONNECTIONS/' $DB_PATH/postgresql.conf"
+fi
+
+if [ -n "$DB_MAX_PREPARED_TRANSACTIONS" ]; then
+  echo "$WHOAMI setting max_prepared_transactions=$DB_MAX_PREPARED_TRANSACTIONS"
+  su postgres -c "sed -i -E -e 's/^#max_prepared_transactions *= *[0-9]+/max_prepared_transactions = $DB_MAX_PREPARED_TRANSACTIONS/' $DB_PATH/postgresql.conf"
+fi
 
 /etc/postgresql/setup.sh &
