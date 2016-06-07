@@ -12,13 +12,13 @@ After initializing the database cluster, `10-initdb` runs `/etc/postgresql/setup
 
 The scripts `etc/cont-init.d/20-db-connections` and `etc/cont-init.d/21-hba-conf` modify the database cluster's configuration
 
-### `etc/cont-init.d/20-db-connections`
+##### `etc/cont-init.d/20-db-connections`
 
 This initialization script sets the `max_connections` database parameter to the value specified by the `DB_MAX_CONNECTIONS` environment variable, if specified.
 
 If the `DB_MAX_PREPARED_TRANSACTIONS` environment variable is specified, the `max_prepared_transactions` database parameter is set to the corresponding value. In this case, any value specified for `DB_MAX_CONNECTIONS` is overridden by the value specified by `DB_MAX_PREPARED_TRANSACTIONS` and is used to set the `max_connections` database parameter.
 
-###`etc/cont-init.d/21-hba-conf`
+##### `etc/cont-init.d/21-hba-conf`
 
 This initialization scripts configures the database cluster's host-based access control to allow connections to the database server.
 
