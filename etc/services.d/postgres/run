@@ -1,11 +1,8 @@
 #!/usr/bin/with-contenv sh
-if [ -z "$DB_NAME" ]; then
-  echo >&2
-  echo "$(basename $0): ERROR: DB_NAME environment variable is not set" >&2
-  echo >&2
-  exit 1
-fi
 
-PGDATA=/var/lib/postgresql/$DB_NAME
+source /etc/postgresql/common.sh
+
+PGDATA=$DB_PATH
 export PGDATA
+
 exec s6-setuidgid postgres postgres -i 2>&1

@@ -1,4 +1,3 @@
 #!/usr/bin/with-contenv sh
-
 source /etc/postgresql/common.sh
-s6-svscanctl -t "$S6_SERVICES" >/dev/null 2>&1
+touch $DB_ONETIME_COMPLETE

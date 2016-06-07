@@ -1,0 +1,8 @@
+#!/usr/bin/with-contenv sh
+source /etc/postgresql/common.sh
+
+if [ ! -d "$DB_LOG" ]; then
+  mkdir "$DB_LOG"
+fi
+
+chown -R nobody:nobody "$DB_LOG"

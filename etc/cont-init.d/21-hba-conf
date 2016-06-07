@@ -1,0 +1,30 @@
+#!/usr/bin/with-contenv sh
+
+source /etc/postgresql/common.sh
+
+if test -f $DB_ONETIME_COMPLETE; then
+  exit
+fi
+
+if ! test -d $DB_PATH -a $DB_PATH/pg_hba.conf; then
+  echo "$WHOAMI no configuration file" >&2
+  exit 1
+fi
+
+if [ -z "$DB_HBA_TRUST_NETS" ]; then
+  DB_HBA_TRUST_NETS="172.17.0.0/16"
+fi
+
+if [ "$DB_HBA_TRUST_NETS" != "none" ]; then
+  for net in $DB_HBA_TRUST_NETS; do
+    echo "$WHOAMI adding $net for 'trust' authentication"
+    su postgres -c "sed -i -E -e '/^host.*all.*all.*127/a host	all		all		$net		trust' $DB_PATH/pg_hba.conf"
+  done
+fi
+
+if [ -n "$DB_HBA_MD5_NETS" -a "$DB_HBA_MD5_NETS" != "none" ]; then
+  for net in $DB_HBA_MD5_NETS; do
+    echo "$WHOAMI adding $net for 'md5' authentication"
+    su postgres -c "sed -i -E -e '$ a host	all		all		$net		md5' $DB_PATH/pg_hba.conf"
+  done
+fi
