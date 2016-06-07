@@ -45,7 +45,6 @@ Alternatively, you can extend the image to replace the `/etc/postgresql/setup.sq
 * `@DB_NAME@` -- value of the `DB_NAME` environment variable (default is _demo_)
 * `@DB_USER@` -- value of the `DB_USER` environment variable (default is `$DB_NAME`)
 * `@DB_PASSWORD@` -- value of the `DB_PASSWORD` environment variable (default is `$DB_PASSWORD`)
-* 
 
 ## Database Access
 
