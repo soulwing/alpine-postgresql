@@ -12,7 +12,7 @@ if ! test -d $DB_PATH -a $DB_PATH/pg_hba.conf; then
 fi
 
 if [ -z "$DB_HBA_TRUST_NETS" ]; then
-  DB_HBA_TRUST_NETS="172.17.0.0/16"
+  DB_HBA_TRUST_NETS="$(route | grep "*" | cut -d " " -f 1)/16"
 fi
 
 if [ "$DB_HBA_TRUST_NETS" != "none" ]; then
