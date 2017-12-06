@@ -1,4 +1,4 @@
-FROM alpine:3.4
+FROM alpine:3.7
 
 RUN apk --update add postgresql s6 && \
     rm -fr /var/cache/apk/*
