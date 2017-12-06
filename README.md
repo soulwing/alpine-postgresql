@@ -22,7 +22,9 @@ If the `DB_MAX_PREPARED_TRANSACTIONS` environment variable is specified, the `ma
 
 This initialization scripts configures the database cluster's host-based access control to allow connections to the database server.
 
-The environment variable `DB_HBA_TRUST_NETS` specifies a space-delimited list of IP networks that should by allowed with the `trust` authentication mechanism. By default, the network `172.17.0.0/16` is added, which allows and trusts connections from the container's host. If you don't want this default behavior, set `DB_HBA_TRUST_NETS` to `none`.
+The environment variable `DB_HBA_TRUST_NETS` specifies a space-delimited list of IP networks that should by allowed with the `trust` authentication mechanism. By default, all global scope IP networks assigned to interfaces in the container are trusted. This allows and trusts connections from other containers in the same Docker network, as well as allowing connections from the host when operating in any of the bridge network modes.
+
+If you don't want this default behavior, set `DB_HBA_TRUST_NETS` to `none` or specify whatever network addresses you wish to trust.
 
 The environment variable `DB_HBA_MD5_NETS` specifies a space-delimited list of IP networks that should be allowed with the `md5` authentication mechanism. By default no networks of this type are added by default.
 
