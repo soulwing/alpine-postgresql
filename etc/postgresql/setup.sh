@@ -15,13 +15,18 @@ fi
 
 # wait for postgres service to be ready
 rc=1
-retries=10
+retries=120
 while [ $rc -ne 0 -a $retries -gt 0 ]; do
   sleep 1
   s6-svwait $POSTGRES_SERVICE 2>/dev/null
   rc=$?
   retries=$(expr $retries - 1)
 done
+
+if [ $rc -ne 0 ]; then
+  echo "$WHOAMI database not ready" >&2
+  exit 1
+fi
 
 # do substitutions for DB_NAME, DB_USER, and DB_PASSWORD in setup.sql
 sqlfile=$(mktemp -t psqlXXXXXX)
