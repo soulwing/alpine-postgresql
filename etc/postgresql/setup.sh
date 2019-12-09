@@ -33,7 +33,23 @@ sqlfile=$(mktemp -t psqlXXXXXX)
 sed -E -e "s/@DB_NAME@/$DB_NAME/g; s/@DB_USER@/$DB_USER/g; s/@DB_PASSWORD@/$DB_PASSWORD/g" < $DB_SETUP_SQL >$sqlfile
 
 # run setup.sql
+rc=2
+retries=30
 echo "$WHOAMI running $DB_SETUP_SQL"
-psql -U postgres -f "$sqlfile"
-echo "$WHOAMI finished $DB_SETUP_SQL"
+while [ $rc -eq 2 -a $retries -gt 0 ]; do
+  psql -U postgres -f "$sqlfile" 
+  rc=$?
+  retries=$(expr $retries - 1)
+  if [ $rc -eq 2 -a $retries -gt 0 ]; then
+    sleep 2
+    echo "$WHOAMI retrying $DB_SETUP_SQL"
+  fi 
+done
+
+if [ $rc -eq 0 ]; then
+  echo "$WHOAMI successfully completed $DB_SETUP_SQL"
+else
+  echo "$WHOAMI failed to complete $DB_SETUP_SQL"
+fi
+
 rm $sqlfile
